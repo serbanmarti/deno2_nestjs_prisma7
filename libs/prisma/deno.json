@@ -1,0 +1,19 @@
+{
+  "name": "@libs/prisma",
+  "version": "1.0.0",
+  "exports": {
+    "./module": "./prisma.module.ts",
+    "./service": "./prisma.service.ts",
+    "./client": "./extras/client.ts",
+    "./types": "./extras/types.ts"
+  },
+  "lint": {
+    "exclude": ["./generated"],
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  },
+  "fmt": {
+    "exclude": ["./generated"]
+  }
+}

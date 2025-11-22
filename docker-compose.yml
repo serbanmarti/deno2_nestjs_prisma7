@@ -1,0 +1,78 @@
+name: deno2-nestjs-prisma-example
+
+services:
+  api:
+    container_name: server
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
+    ports:
+      - "3000:3000"
+    networks:
+      - main
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres_migrate:
+        condition: service_completed_successfully
+      postgres_seed:
+        condition: service_completed_successfully
+
+  postgres:
+    container_name: postgres
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - main
+
+  postgres_migrate:
+    container_name: postgres_migrate
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.prisma_migrate
+    environment:
+      DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
+    networks:
+      - main
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres_seed:
+    container_name: postgres_seed
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.prisma_seed
+    environment:
+      DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
+    networks:
+      - main
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres_migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pg-data:
+
+networks:
+  main:
+    driver: bridge

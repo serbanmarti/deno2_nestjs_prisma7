@@ -1,0 +1,19 @@
+FROM denoland/deno:2.5.6
+
+# Fix OpenSSL issue for prisma
+RUN [ ! -e /lib/libssl.so.3 ] && ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3 || echo "libssl link already exists"
+
+# Copy the Deno configuration (not optimal)
+COPY deno.json ./
+COPY libs/prisma/deno.json ./libs/prisma/deno.json
+
+# Install the dependencies
+RUN deno install --allow-scripts
+
+# Copy the necesasry Prisma files
+COPY prisma/schema.prisma ./prisma/schema.prisma
+COPY prisma/migrations ./prisma/migrations
+COPY prisma.config.ts ./prisma.config.ts
+
+# Migrate the database
+CMD deno run prisma:migrate

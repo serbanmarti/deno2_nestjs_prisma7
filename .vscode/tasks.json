@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "docker-local",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": [
+        "up",
+        "--build",
+        "--detach",
+        "--remove-orphans"
+      ],
+      "problemMatcher": [],
+      "detail": "Start a local instance (all services)"
+    },
+    {
+      "label": "docker-local-db",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": [
+        "up",
+        "--build",
+        "--detach",
+        "--remove-orphans",
+        "postgres",
+        "postgres_migrate",
+        "postgres_seed"
+      ],
+      "problemMatcher": [],
+      "detail": "Start a local DB instance (migrations & seed included)"
+    }
+  ]
+}
